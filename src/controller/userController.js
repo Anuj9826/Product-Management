@@ -1,3 +1,9 @@
+const userModel = require("..models/userModel")
+const validation = require('..validator/validation')
+
+
+
+
 const registration = async function(req, res) {
 
     try{
@@ -25,4 +31,3 @@ const registration = async function(req, res) {
 
     }catch (error) {
         res.status(500).send({ status: false, message: error.message });
-}
