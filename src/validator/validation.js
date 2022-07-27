@@ -1,49 +1,41 @@
 const mongoose = require('mongoose')
 
-const isBodyEmpty = function(data)
-{
-    if(Object.keys(data).length==0) return false  
-    return true 
+const isValid = function (value) {
+    if ( typeof value == null) return false;
+    if (typeof value === "string" && value.trim().length === 0) return false;
+    return true;
 }
 
-const isValid = function(value)
-{
-    if(typeof value === 'undefined' || typeof value === null ) return false
-    if(typeof value ==='string' && value.trim().length === 0) return false // name: ""
-    return true
+const isValidRequest = function(body){
+    if(Object.keys(body).length ===0) return false;
+    return true;
 }
 
-// pincode validation
-const isValidPincode = function (pincode) {
-    const pattern = /^[1-9]{1}[0-9]{2}\s?[0-9]{3}$/;
-    return pattern.test(pincode); // returns a boolean
-  };
-
-const isValidOjectId = function(id)
-{
-    if(mongoose.Types.ObjectId.isValid(id)) return true;
-    return false;
+const isValidName = function(name){
+    return /^[a-zA-Z ]{3,20}$/.test(name)
 }
 
+const isValidPincode = function(num){
+    return /^[0-9]{6}$/.test(num)
+   
+  }
+  
+  const isValidPhone = function(phone) {
+    return /^[0]?[6789]\d{9}$/.test(phone)
+  }
 
-const validateEmail = function (mail) {
-    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
-        return (true)
-    }
-};
+  const isValidEmail = function(Email) {
+    return  /^([A-Za-z0-9._]{3,}@[A-Za-z]{3,}[.]{1}[A-Za-z.]{2,6})+$/.test(Email)
+  }
 
-const regex = /[`/\d/!@#$%^&*()_+\=\[\]{};':"\\|.<>\/?~]/
-const isVerifyString = function (string) {
-    return regex.test(string)
-};
+  const isValidPwd = function(Password)  {
+    return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,15}$/.test(Password)
+  }
 
-const regEx=/^[6-9]\d{9}$/
-const isValidMobileNo = function(mobno)
-{
-    return regEx.test(mobno)
-}
+  const isValidObjectId = function(ObjectId) {
+    return mongoose.Types.ObjectId.isValid(ObjectId)
+  }
+  
+  
 
-
-
-
-module.exports={ isBodyEmpty, isValid,validateEmail,isValidMobileNo, isVerifyString, isValidOjectId,checkISBN,isValidPincode,isValidRelAt, checkRating}
+module.exports={isValid, isValidRequest,isValidName ,isValidPincode, isValidPhone,isValidEmail,isValidPwd,isValidObjectId}

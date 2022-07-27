@@ -1,14 +1,17 @@
 let express = require("express")
 let router = express.Router()
 
-let { registration, userLogin } = require("../controller/userController")
+let {  userRegistration, loginUser } = require("../controller/userController")
 
 
 
 
 
-router.post("/register", registration)
-router.post('/Login', userLogin )
+router.post("/register", userRegistration)
+router.post('/Login', loginUser )
+router.all("/**", function (req, res) {
+    return res.status(404).send({ status: false, message: "Requested Api is Not Available" });
+    });
 
 
 module.exports = router;
