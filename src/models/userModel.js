@@ -1,62 +1,61 @@
-const mongoose = require("mongoose")
+const mongoose = require('mongoose')
 
-let UserSchema = new mongoose.Schema({
-    fname:{
-        type: String,
-        required: true,  
-    },
-    lname:{
-        type: String,
-        required: true, 
-    },
-    email:{
-        type: String,
-        required: true, 
-        unique: true
-    },
-    profileImage:{
+const userSchema = new mongoose.Schema({
+    fname: {
         type: String,
         required: true,
+        trim: true
     },
-    phone:{
+    lname: {
         type: String,
-        required: true, 
+        required: true,
+        trim: true
+    },
+    email: {
+        type: String,
+        required: true,
+        trim: true,
         unique: true
     },
-    password:{
+    profileImage: {
         type: String,
-        required: true, 
-        min: 8,
-        max: 15
+        required: true
     },
-    address:{
-        street:{
-            type: String,
-            required: true,
-        },
-        city:{
-            type: String,
-            required: true,
-        },
-        pincode:{
-            type: Number,
-            required: true,
-        }
+    phone: {
+        type: String,
+        required: true,
+        trim: true,
+        unique: true
     },
-    billing:{
-        street:{
-            type: String,
-            required: true,
+    password: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    address: {
+        shipping:{
+            street:{ type: String,
+                    required: true,
+                    trim: true},
+            city:{ type: String,
+                    required: true,
+                    trim: true},
+            pincode:{ type: Number,
+                    required: true,
+                    }    
         },
-        city:{
-            type: String,
-            required: true,
-        },
-        pincode:{
-            type: Number,
-            required: true,
-        }
+        billing:{
+            street:{ type: String,
+                    required: true,
+                    trim: true},
+            city:{ type: String,
+                    required: true,
+                    trim: true},
+            pincode:{ type: Number,
+                    required: true,
+                    } 
+        }  
     }
-}, {timestamps: true})
+},{timestamps:true})
 
-module.exports = mongoose.model('User', UserSchema)
+module.exports = mongoose.model('User', userSchema)
