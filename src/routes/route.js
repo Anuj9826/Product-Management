@@ -1,17 +1,20 @@
-let express = require("express")
-let router = express.Router()
+const express = require('express')
+const {createUser, loginUser,getUserProfile, updateUser} = require('../controller/userController')
+const { authentication } = require("../middleware/auth")
+const router = express.Router()
 
-let {  userRegistration, loginUser } = require("../controller/userController")
-
-
-
-
-
-router.post("/register", userRegistration)
-router.post('/Login', loginUser )
-router.all("/**", function (req, res) {
-    return res.status(404).send({ status: false, message: "Requested Api is Not Available" });
-    });
+router.post('/register', createUser)
+router.post('/login', loginUser)
+router.get("/user/:userId/profile", getUserProfile)
+router.put("/user/:userId/profile", updateUser)
 
 
-module.exports = router;
+//Validating the endpoint
+router.all("/*", function (req, res) {
+    return res
+    .status(404)
+    .send({ status: false, message: "Page Not Found" });
+});
+
+
+module.exports = router

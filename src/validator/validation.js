@@ -1,41 +1,61 @@
 const mongoose = require('mongoose')
 
-const isValid = function (value) {
-    if ( typeof value == null) return false;
-    if (typeof value === "string" && value.trim().length === 0) return false;
-    return true;
-}
+//validation for empty request body
+const isValidRequest = function(data){
+    if(Object.keys(data).length == 0){
+        return false
+    }
+    return true
+  }
 
-const isValidRequest = function(body){
-    if(Object.keys(body).length ===0) return false;
-    return true;
+const isValidString = function (value) {
+    if (typeof value == undefined || value == null) return false;
+    if (typeof value == "string" && value.trim().length == 0) return false;
+    else if (typeof value == "string") return true;
 }
 
 const isValidName = function(name){
-    return /^[a-zA-Z ]{3,20}$/.test(name)
+    return /^[a-zA-Z ,]+.*$/.test(name)
+} 
+
+// function for email verification
+const isValidMail = function (email) {
+    return /^([0-9a-z]([-_\\.]*[0-9a-z]+)*)@([a-z]([-_\\.]*[a-z]+)*)[\\.]([a-z]{2,9})+$/.test(email);
+};
+
+//function for verifying mobile number
+const isValidPhone = function(phone){
+    return  /^((\+91(-| )+)|0)?[6-9][0-9]{9}$/.test(phone); 
+  };
+
+// function for password verification
+const isValidPassword = function (pass) {
+    return /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,15}$/.test(pass);
+  };
+
+ //function for pincode verification
+ const isValidPincode = function(pin){
+    return /^[1-9][0-9]{5}$/.test(pin)
+};
+
+const isValidId = function(id){
+    if(!mongoose.Types.ObjectId.isValid(id)){
+     return false
+    }return true
+ }
+
+const isImageFile = function(files){
+    let imageRegex = /.*\.(jpeg|jpg|png)$/;
+    return imageRegex.test(files)
 }
 
-const isValidPincode = function(num){
-    return /^[0-9]{6}$/.test(num)
-   
-  }
-  
-  const isValidPhone = function(phone) {
-    return /^[0]?[6789]\d{9}$/.test(phone)
-  }
 
-  const isValidEmail = function(Email) {
-    return  /^([A-Za-z0-9._]{3,}@[A-Za-z]{3,}[.]{1}[A-Za-z.]{2,6})+$/.test(Email)
-  }
-
-  const isValidPwd = function(Password)  {
-    return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,15}$/.test(Password)
-  }
-
-  const isValidObjectId = function(ObjectId) {
-    return mongoose.Types.ObjectId.isValid(ObjectId)
-  }
-  
-  
-
-module.exports={isValid, isValidRequest,isValidName ,isValidPincode, isValidPhone,isValidEmail,isValidPwd,isValidObjectId}
+module.exports = {  isValidRequest,
+                    isValidString,
+                    isValidName,
+                    isValidMail,
+                    isValidPhone,
+                    isValidPassword,
+                    isValidPincode,
+                    isValidId,
+                    isImageFile}

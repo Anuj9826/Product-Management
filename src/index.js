@@ -2,8 +2,10 @@ const express = require("express")
 const route = require("./routes/route")
 const app = express()
 const mongoose = require("mongoose")
-
+const multer = require("multer")
 app.use(express.json())
+
+app.use(multer().any())
 
 
 mongoose.connect("mongodb+srv://Pragesh_Yadav:Mongoblog22@cluster0.ebq4hak.mongodb.net/ProductManagementGroup59",
