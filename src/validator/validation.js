@@ -11,7 +11,7 @@ const isValidRequest = function(data){
 const isValidString = function (value) {
     if (typeof value == undefined || value == null) return false;
     if (typeof value == "string" && value.trim().length == 0) return false;
-    else if (typeof value == "string") return true;
+    return true;
 }
 
 const isValidName = function(name){
@@ -49,6 +49,22 @@ const isImageFile = function(files){
     return imageRegex.test(files)
 }
 
+const isValidPrice = function (value) {
+    if (/^\d+(\.\d{1,2})?$/.test(value)) return true;
+    return false;
+  };
+
+  const isValidBoolean = function (value) {
+    return value === "true" || value === "false";
+  };
+
+  const isValidNum = function (value) {
+    if (!/^[0-9]+$/.test(value)) {
+      return false;
+    }
+    return true;
+  };
+
 
 module.exports = {  isValidRequest,
                     isValidString,
@@ -58,4 +74,7 @@ module.exports = {  isValidRequest,
                     isValidPassword,
                     isValidPincode,
                     isValidId,
-                    isImageFile}
+                    isImageFile,
+                    isValidPrice,
+                    isValidBoolean,
+                    isValidNum}
