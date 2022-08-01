@@ -6,6 +6,10 @@ const {
   isValidNum,
   isImageFile,
   isValidId,
+  isSize,
+  isValidPrice,
+  isValidBoolean,
+  isValidSize,
 } = require("../validator/validation");
 const aws = require("../AWS/awsConfig");
 
@@ -204,27 +208,89 @@ const createProduct = async function (req, res) {
 const getProduct = async function (req, res) {
   try {
     let data = req.query;
-    let obj = {};
+    let {size, name, priceGreaterThan, priceLessThan, priceShort, ...obj} = data
 
-    if (data.name != undefined) {
-      obj.title = data.name;
+    if(!isValidRequest(obj)){
+      return res.status(400).send({
+        status: false,
+        message: "Bad filter object"
+      })
     }
-    if (data.size != undefined) {
-      obj.availableSizes = data.size.toUpperCase();
+    let filterName = {}
+    if(size){
+      if(size && isSize(size)){
+        res.status(400).send({
+          status: false,
+          message: "Size must be S, XS, M, L, X, XL, XXL"
+        })
+      }
+      size = size.toUpperCase();
+      filterName.availableSizes = {$in: size};
     }
-    if (data.priceGreaterThan != undefined) {
-      obj.price = { $gt: data.priceGreaterThan };
+    if(name){
+      if(name && !isValidString(name)){
+        return res.status(400).send({
+          status: false,
+          message: "Name is not valid"
+        })
+      }
     }
-    if (data.priceLessThan != undefined) {
-      obj.price = { $lt: data.priceLessThan };
+    if(priceGreaterThan || priceLessThan){
+      let filter = {};
+      if(priceGreaterThan){
+        if(priceGreaterThan && !isValidNum(priceGreaterThan)){
+          return res.status(400).send({
+            status: false,
+            message: "Please enter valid greater than price"
+          })
+        }
+        filter.$gt = priceGreaterThan
+      }
+      if(priceLessThan){
+        if(priceLessThan && !isValidNum(priceLessThan)){
+          return res.status(400).send({
+            status: false,
+            message: "Please enter valid less than price"
+          })
+        }
+        filter.$lt = priceLessThan
+      }
+      filterName.price = filter;
     }
 
-    obj.isDeleted = false;
+    let shortFilter = {}
+    shortFilter.price = 1;
 
+    if(priceShort){
+      if(priceShort && !["1", "-1"].includes(priceShort)){
+        return res.status(400).send({
+          status: false,
+          message: "Please enter valid shorting"
+        })
+      }
+      shortFilter.price = parseInt(priceShort)
+    }
+    // if (data.name != undefined) {
+    //   obj.title = data.name;
+    // }
+    // if (data.size != undefined) {
+    //   obj.availableSizes = data.size.toUpperCase();
+    // }
+    // if (data.priceGreaterThan != undefined) {
+    //   obj.price = { $gt: data.priceGreaterThan };
+    // }
+    // if (data.priceLessThan != undefined) {
+    //   obj.price = { $lt: data.priceLessThan };
+    // }
+
+    // obj.isDeleted = false;
+    let checkProduct = {isDeleted: false}
+    let copyData = Object.assign(filterName, checkProduct) // The Object.assign() method copies all enumerable own properties from one or more source objects to a target object.
     const productData = await productModel
-      .find(obj)
-      .sort({ price: 1 })
-      .select({ deletedAt: 0 });
+      .find(copyData)
+      .collation({locale: "en"})   //Collation allows users to specify language-specific rules for string comparison
+      .sort(shortFilter)
+      
 
     if (productData.length == 0) {
       return res
@@ -269,9 +335,152 @@ const getProductById = async function (req, res) {
   }
 };
 
+// <============================> Update product <============================>
+
+const updateProduct = async function(req, res){
+  try {
+    let productId = req.params
+
+    if(!isValidId(productId)){
+      return res.status(400).send({
+        status: false,
+        message: "Product Id is not Valid"
+      })
+    }
+    let productDetails = await productModel.findById(productId)
+
+    if(!productDetails || productDetails.isDeleted == true){
+      return res.status(400).send({
+        status: false,
+        message: "Product does not exist"
+      })
+    }
+
+    let data = {...req.body} 
+
+    if(!isValidRequest(data)){
+      return res.status(400).send({
+        status: false,
+        message: "Please provide data to update the product"
+      })
+    }
+
+    let {title,description,price,isFreeShipping,style,availableSizes,installments} = data
+
+    let updateProductDetails = {}
+    if(data.hasOwnProperty("title")){
+      if(!isValidName(title)){
+        return res.status(400).send({
+          status: false,
+          message: "Please enter a valid title"
+        })
+      }
+      updateProductDetails.title = data.title
+    }
+    
+    let duplicateTitle = await productModel.findOne({
+      title: title,
+      isDeleted:false
+    })
+    if(duplicateTitle){
+      return res.status(400).send({
+        status:false,
+        message: "This title already exist "
+      })
+    }
+
+    if(data.hasOwnProperty("description")){
+      if(!isValidName(description)){
+        return res.status(400).send({
+          status: false,
+          message: "Please enter a valid description"
+        })
+      }
+      updateProductDetails.description = data.description
+    }
+    if(data.hasOwnProperty("price")){
+      if(!isValidPrice(price)){
+        return res.status(400).send({
+          status: false,
+          message: "Please enter a valid price"
+        })
+      }
+      updateProductDetails.price = data.price
+    }
+
+    if(data.hasOwnProperty("isFreeShipping")){
+      if(!isValidBoolean(isFreeShipping)){
+        return res.status(400).send({
+          status: false,
+          message: "Please enter a valid isFreeShipping value"
+        })
+      }
+      updateProductDetails.isFreeShipping = data.isFreeShipping
+    }
+
+    let files = req.files
+
+    if(files.length){
+      if(!isImageFile(files[0].originalname)){
+        return res.status(400).send({
+          status: false,
+          message: "File extension not supported!"
+        })
+      }
+      let uploadedFileURL = await uploadFile(files[0]);
+      updateProductDetails.productImage = uploadedFileURL
+    }
+
+    if(data.hasOwnProperty("style")){
+      if(!isValidName(style)){
+        return res.status(400).send({
+          status: false,
+          message: "Please enter a valid style"
+        })
+      }
+      updateProductDetails.style = data.style
+    }
+
+    if(data.hasOwnProperty("availableSizes")){
+      if(!isValidSize(availableSizes)){
+        return res.status(400).send({
+          status: false,
+          message: "Size must be S, XS, M, L, X, XL, XXL"
+        })
+      }
+      updateProductDetails.availableSizes = isValidSize(availableSizes)
+    }
+
+    if(data.hasOwnProperty("installments")){
+      if(!isValidNum(installments)){
+        return res.status(400).send({
+          status: false,
+          message: "Instalment must be a number"
+        })
+      }
+      updateProductDetails.installments = data.installments
+    }
+
+    if(data.hasOwnProperty("isDeleted")){
+      return res.status(400).send({
+        status: false,
+        message: "You can't update isDeleted value"
+      })
+    }
+
+    let updateProduct = await productModel.findOneAndUpdate(
+      {_id: productId},
+      updateProductDetails,
+      {new: true}
+    );
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+  }
+}
+
 //============================ Delete by ID ==============>
 
-const deletebyId = async function (req, res) {
+const deleteById = async function (req, res) {
   try {
     let product = req.params.productId;
     if (!isValidId(product)) {
@@ -300,4 +509,4 @@ const deletebyId = async function (req, res) {
   }
 };
 
-module.exports = { createProduct, getProduct, getProductById, deletebyId };
+module.exports = { createProduct, getProduct, getProductById, updateProduct, deleteById };

@@ -65,6 +65,28 @@ const isValidPrice = function (value) {
     return true;
   };
 
+  const isSize = function (title) {
+    return ["S", "XS", "M", "X", "L", "XXL", "XL"].includes(title.toUpperCase());
+  };
+
+  const isValidSize = (Arr) => {
+    let newArr = [];
+    if (Arr.length === 0) {
+      return false;
+    }
+    let brr = Arr[0].split(",");
+    for (let i = 0; i < brr.length; i++) {
+      if (
+        !["S", "XS", "M", "X", "L", "XXL", "XL"].includes(brr[i].toUpperCase())
+      ) {
+        return false;
+      }
+      newArr.push(brr[i].toUpperCase());
+    }
+    return newArr;
+  };
+  
+
 
 module.exports = {  isValidRequest,
                     isValidString,
@@ -78,4 +100,6 @@ module.exports = {  isValidRequest,
                     isValidPrice,
                     isValidBoolean,
                     isValidNum,
-                    isImageFile}
+                    isImageFile,
+                    isSize,
+                    isValidSize}
