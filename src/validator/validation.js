@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require("bcrypt");
 
 //validation for empty request body
 const isValidRequest = function(data){
@@ -49,6 +50,12 @@ const isImageFile = function(files){
     return imageRegex.test(files)
 }
 
+const hashPassword = async (password) => {
+  const hash = await bcrypt.hash(password, 10);
+  return hash;
+  // console.log(await bcrypt.compare(password, hash))
+};
+
 const isValidPrice = function (value) {
     if (/^\d+(\.\d{1,2})?$/.test(value)) return true;
     return false;
@@ -85,6 +92,11 @@ const isValidPrice = function (value) {
     }
     return newArr;
   };
+
+  const isValidStatus = function (status) {
+    let enumArr = ["pending", "completed", "cancelled"];
+    return enumArr.includes(status); // returns a boolean
+  };
   
 
 
@@ -97,9 +109,11 @@ module.exports = {  isValidRequest,
                     isValidPincode,
                     isValidId,
                     isImageFile,
+                    hashPassword,
                     isValidPrice,
                     isValidBoolean,
                     isValidNum,
                     isImageFile,
                     isSize,
-                    isValidSize}
+                    isValidSize,
+                    isValidStatus}
