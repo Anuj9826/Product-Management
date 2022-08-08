@@ -2,10 +2,11 @@ const jwt = require("jsonwebtoken");
 const { isValidId } = require("../validator/validation");
 const userModel = require("../models/userModel");
 
+
+
+
 //************************   Authentication ***********************//
 
-
-      
 const authentication = async function (req, res, next) {
     try {
       let token = req.headers.authorization;
@@ -18,7 +19,7 @@ const authentication = async function (req, res, next) {
         });
       }
   
-      // This👇 is written here to avoid internal server error (if token is not present)
+      // This is written here to avoid internal server error (if token is not present)
       token = token.split(" ")[1];
   
       jwt.verify(

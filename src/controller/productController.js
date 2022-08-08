@@ -204,7 +204,7 @@ const getProduct = async function (req, res) {
     }
     let filterName = {}
     if(size){
-      if(size && isSize(size)){
+      if(size && !isSize(size)){
         res.status(400).send({
           status: false,
           message: "Size must be S, XS, M, L, X, XL, XXL"
@@ -252,7 +252,7 @@ const getProduct = async function (req, res) {
       if(priceShort && !["1", "-1"].includes(priceShort)){
         return res.status(400).send({
           status: false,
-          message: "Please enter valid shorting"
+          message: "Please enter valid shorting filter"
         })
       }
       shortFilter.price = parseInt(priceShort)
@@ -266,7 +266,7 @@ const getProduct = async function (req, res) {
       .sort(shortFilter)
       
 
-    if (productData.length == 0) {
+    if (!productData.length) {
       return res
         .status(404)
         .send({ status: false, message: "No product found" });
@@ -484,7 +484,7 @@ const updateProduct = async function(req, res){
       updateProductDetails,
       {new: true}
     );
-    res.status(200).send({
+    return res.status(200).send({
       status: true,
       message: "Product details updated",
       data: updateProduct,
