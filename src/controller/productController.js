@@ -196,12 +196,12 @@ const getProduct = async function (req, res) {
     let data = req.query;
     let {size, name, priceGreaterThan, priceLessThan, priceShort, ...obj} = data
 
-    if(!isValidRequest(obj)){
-      return res.status(400).send({
-        status: false,
-        message: "Bad filter object"
-      })
-    }
+    // if(!isValidRequest(obj)){
+    //   return res.status(400).send({
+    //     status: false,
+    //     message: "Bad filter object"
+    //   })
+    // }
     let filterName = {}
     if(size){
       if(size && !isSize(size)){
@@ -220,7 +220,7 @@ const getProduct = async function (req, res) {
           message: "Name is not valid"
         })
       }
-      filterQuery.title = { $regex: name, $options: "i" };
+      filterName.title = { $regex: name, $options: "i" };
     }
     if(priceGreaterThan || priceLessThan){
       let filter = {};
@@ -284,8 +284,8 @@ const getProduct = async function (req, res) {
 
 const getProductById = async function (req, res) {
   try {
-    let id = req.params.productId;
-    if (!isValidId(id)) {
+    let productId = req.params.productId;
+    if (!isValidId(productId)) {
       return res
         .status(404)
         .send({ status: false, message: "Please enter valid product id" });

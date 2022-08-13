@@ -6,7 +6,7 @@ const { isValidId, isValidRequest } = require("../validator/validation")
 
 const createOrder = async function(req, res){
     try {
-        const userId = req.params.userId
+        let userId = req.params.userId
         let data = req.body
 
         if(!isValidRequest(data)){
@@ -24,8 +24,8 @@ const createOrder = async function(req, res){
                 message: `User id ${userId} not valid`
             })
         }
-
-        const checkUser = await userModel.findByID({_id: userId})
+        //console.log(userId)
+        const checkUser = await userModel.findById({_id: userId})
         if(!checkUser){
             return res.status(404).send({
                 status: false,
